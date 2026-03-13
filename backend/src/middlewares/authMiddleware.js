@@ -11,6 +11,7 @@ const jwt = require('jsonwebtoken');
 //El next() es nuevo — 
 //es lo que le dice a Express que continúe al siguiente middleware o al controlador.
 //Todo middleware recibe (req, res, next).
+
 function authMiddleware(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];

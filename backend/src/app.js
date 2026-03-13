@@ -3,11 +3,14 @@ require('dotenv').config() //dotenv.config() lee el archivo .env y carga las var
 const express = require('express')
 const { connectDB } = require('./config/db')
 const authRoutes = require('./routes/authRoutes')
+const categoryRoutes = require('./routes/categoryRoutes')
 const app = express()
 
 
 app.use(express.json())
 
+
+app.use('/api/categories', categoryRoutes)
 app.use('/api/auth', authRoutes)
 
 app.get('/api/health', (req, res) => {
