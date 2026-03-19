@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { getTransactions } from '../../services/transactionService'
+import TransactionForm from '../../components/TransactionForm'
 
 function Dashboard() {
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(true)
   const { logout } = useAuth()
+  const [showForm, setShowForm] = useState(false)
 
   useEffect(() => {
     fetchTransactions()
@@ -59,6 +61,24 @@ function Dashboard() {
             <p className="text-2xl font-bold text-red-600">${totalGastos.toFixed(2)}</p>
           </div>
         </div>
+
+        {/* Botón para mostrar el formulario */}
+        <div className="mb-6">
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition text-sm"
+          >
+            {showForm ? '✕ Cancelar' : '+ Nueva transacción'}
+          </button>
+          {showForm && (
+            <div className="mt-4">
+              <TransactionForm onTransactionCreated={() => {
+                fetchTransactions()
+                setShowForm(false)
+              }} />
+            </div>
+          )}
+          </div>
 
         {/* Lista de transacciones */}
         <div className="bg-white rounded-2xl shadow-sm p-6">

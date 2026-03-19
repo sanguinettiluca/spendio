@@ -1,0 +1,144 @@
+import { useState, useEffect, use } from 'react'
+import { getCategories } from '../services/categoryService'
+import { createTransaction } from '../services/transactionService'
+
+function TransactionForm({onTransactionCreated}) {
+    const [categories, setCategories] = useState([])
+    const [form, setForm] = useState({
+        categoryId: '',
+        amount: '',
+        type: 'expense',
+        description: '',
+        date: new Date().toISOString().slice(0, 10)
+    })
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
+
+    useEffect(() => {
+        fetchCategories()
+    }, [])
+
+    const fetchCategories = async() => {
+        try{
+            const response = await getCategories()
+            setCategories(response.data)
+        }catch(error){
+            console.error('Error cargando categorías:', error)
+        }
+    }
+
+    const handleChange = (e) => {
+        setForm({
+            ...form,
+            [e.target.name]: e.target.value
+        })
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        setLoading(true)
+        setError('')
+
+        try {
+            await createTransaction(form)
+            setForm({
+                categoryId: '',
+                ammount: '',
+                type: 'expense',
+                description: '',
+                date: new Date().toISOString().slice(0, 10)
+            })
+            onTransactionCreated()
+        }catch(error){
+            setError('Error al crear la transacción')
+        }finally{
+            setLoading(false)
+        }
+    }
+
+    return (
+    <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+      <h2 className="text-lg font-semibold text-gray-800 mb-4">Nueva transacción</h2>
+      {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+            <select
+              name="type"
+              value={form.type}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="expense">Gasto</option>
+              <option value="income">Ingreso</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+            <select
+              name="categoryId"
+              value={form.categoryId}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            >
+              <option value="">Seleccioná una categoría</option>
+              {categories.map(c => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Monto</label>
+            <input
+              type="number"
+              name="amount"
+              value={form.amount}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="0.00"
+              min="0"
+              step="0.01"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+            <input
+              type="date"
+              name="date"
+              value={form.date}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+          <input
+            type="text"
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Ej: Supermercado"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50 text-sm"
+        >
+          {loading ? 'Guardando...' : 'Agregar transacción'}
+        </button>
+      </form>
+    </div>
+  )
+
+}
+
+export default TransactionForm
