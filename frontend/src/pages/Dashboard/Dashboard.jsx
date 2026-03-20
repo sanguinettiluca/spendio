@@ -94,6 +94,7 @@ function Dashboard() {
             <div className="mt-4">
               <TransactionForm onTransactionCreated={() => {
                 fetchTransactions()
+                fetchStats()
                 setShowForm(false)
               }} />
             </div>

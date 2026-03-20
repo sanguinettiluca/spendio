@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { login as loginService } from '../../services/authService'
+import { Link } from 'react-router-dom'
 
 function Login() {
   const [email, setEmail] = useState('')
@@ -71,7 +72,14 @@ function Login() {
             {loading ? 'Cargando...' : 'Ingresar'}
           </button>
         </form>
+
+        <p className="text-center text-sm text-gray-500 mt-4">
+          ¿No tenés cuenta?{' '}
+          <Link to="/register" className="text-blue-600 hover:underline">Registrate</Link>
+        </p>
+        
       </div>
+
     </div>
   )
 
