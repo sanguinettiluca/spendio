@@ -5,6 +5,7 @@ import TransactionForm from '../../components/TransactionForm'
 import CategoryChart from '../../components/CategoryChart'
 import MonthlyChart from '../../components/MonthlyChart'
 import { getStatsByCategory, getMonthlyStats } from '../../services/statsService'
+import Modal from '../../components/Modal'
 
 function Dashboard() {
   const [transactions, setTransactions] = useState([])
@@ -14,6 +15,7 @@ function Dashboard() {
   const [categoryStats, setCategoryStats] = useState([])
   const [monthlyStats, setMonthlyStats] = useState([])
   const [filters, setFilters] = useState({ startDate: '', endDate: '' })
+  const [editingTransaction, setEditingTransaction] = useState(null)
 
 
   useEffect(() => {
@@ -153,6 +155,19 @@ function Dashboard() {
             </div>
           )}
           </div>
+          {editingTransaction && (
+            <Modal onClose={() => setEditingTransaction(null)}>
+              <TransactionForm
+                transaction={editingTransaction}
+                onTransactionCreated={() => {
+                  fetchTransactions()
+                  fetchStats()
+                  setEditingTransaction(null)
+                }}
+                onCancel={() => setEditingTransaction(null)}
+              />
+            </Modal>
+)}
 
         {/* Lista de transacciones */}
         <div className="bg-white rounded-2xl shadow-sm p-6">
@@ -171,6 +186,12 @@ function Dashboard() {
                     <p className={`font-semibold ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
                       {t.type === 'income' ? '+' : '-'}${Number(t.amount).toFixed(2)}
                     </p>
+                    <button
+                      onClick={() => setEditingTransaction(t)}
+                      className="text-gray-400 hover:text-blue-500 transition text-sm"
+                    >
+                      ✎
+                    </button>
                     <button
                       onClick={() => handleDelete(t.id)}
                       className="text-gray-400 hover:text-red-500 transition text-sm"

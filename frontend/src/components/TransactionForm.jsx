@@ -1,15 +1,15 @@
 import { useState, useEffect, use } from 'react'
 import { getCategories } from '../services/categoryService'
-import { createTransaction } from '../services/transactionService'
+import { createTransaction, updateTransaction } from '../services/transactionService'
 
-function TransactionForm({onTransactionCreated}) {
+function TransactionForm({onTransactionCreated, transaction = null, onCancel}) {
     const [categories, setCategories] = useState([])
     const [form, setForm] = useState({
-        categoryId: '',
-        amount: '',
-        type: 'expense',
-        description: '',
-        date: new Date().toISOString().slice(0, 10)
+        categoryId: transaction ? transaction.category_id : '',
+        amount: transaction ? transaction.amount : '',
+        type: transaction ? transaction.type : 'expense',
+        description: transaction ? transaction.description : '',
+        date: transaction?.date?.slice(0, 10) || new Date().toISOString().slice(0, 10)
     })
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
@@ -40,15 +40,12 @@ function TransactionForm({onTransactionCreated}) {
         setError('')
 
         try {
+          if(transaction){
+            await updateTransaction(transaction.id, form)
+          }else{
             await createTransaction(form)
-            setForm({
-                categoryId: '',
-                ammount: '',
-                type: 'expense',
-                description: '',
-                date: new Date().toISOString().slice(0, 10)
-            })
-            onTransactionCreated()
+          }
+          onTransactionCreated()
         }catch(error){
             setError('Error al crear la transacción')
         }finally{
@@ -58,7 +55,7 @@ function TransactionForm({onTransactionCreated}) {
 
     return (
     <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">Nueva transacción</h2>
+      <h2 className="text-lg font-semibold text-gray-800 mb-4">{transaction ? 'Editar transacción' : 'Nueva transacción'}</h2>
       {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
@@ -128,13 +125,24 @@ function TransactionForm({onTransactionCreated}) {
             placeholder="Ej: Supermercado"
           />
         </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50 text-sm"
-        >
-          {loading ? 'Guardando...' : 'Agregar transacción'}
-        </button>
+        <div className="flex gap-2">
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="w-full border border-gray-300 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-50 transition text-sm"
+            >
+              Cancelar
+            </button>
+          )}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50 text-sm"
+          >
+            {loading ? 'Guardando...' : transaction ? 'Guardar cambios' : 'Agregar transacción'}
+          </button>
+        </div>
       </form>
     </div>
   )
