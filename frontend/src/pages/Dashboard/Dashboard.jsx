@@ -2,15 +2,22 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { getTransactions } from '../../services/transactionService'
 import TransactionForm from '../../components/TransactionForm'
+import CategoryChart from '../../components/CategoryChart'
+import MonthlyChart from '../../components/MonthlyChart'
+import { getStatsByCategory, getMonthlyStats } from '../../services/statsService'
 
 function Dashboard() {
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(true)
   const { logout } = useAuth()
   const [showForm, setShowForm] = useState(false)
+  const [categoryStats, setCategoryStats] = useState([])
+  const [monthlyStats, setMonthlyStats] = useState([])
+
 
   useEffect(() => {
     fetchTransactions()
+    fetchStats()
   }, [])
 
   const fetchTransactions = async () => {
@@ -21,6 +28,19 @@ function Dashboard() {
       console.error('Error cargando transacciones:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchStats = async () => {
+    try {
+      const [categoryRes, monthlyRes] = await Promise.all([
+          getStatsByCategory(),
+          getMonthlyStats()
+      ])
+      setCategoryStats(categoryRes.data)
+      setMonthlyStats(monthlyRes.data)
+    } catch (error) {
+      console.error('Error cargando stats:', error)
     }
   }
 
@@ -101,6 +121,12 @@ function Dashboard() {
             </ul>
           )}
         </div>
+
+        <div className="grid grid-cols-2 gap-4 mt-6">
+          <CategoryChart data={categoryStats} />
+          <MonthlyChart data={monthlyStats} />
+        </div>
+
       </div>
     </div>
   )
