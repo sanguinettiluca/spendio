@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import { getTransactions } from '../../services/transactionService'
+import { getTransactions, deleteTransaction } from '../../services/transactionService'
 import TransactionForm from '../../components/TransactionForm'
 import CategoryChart from '../../components/CategoryChart'
 import MonthlyChart from '../../components/MonthlyChart'
@@ -19,6 +19,17 @@ function Dashboard() {
     fetchTransactions()
     fetchStats()
   }, [])
+
+  const handleDelete = async (id) => {
+    if(!window.confirm('Estás seguro que querés borrar esta transacción?')) return
+    try{
+      await deleteTransaction(id)
+      fetchTransactions()
+      fetchStats()
+    }catch(error){
+      console.error('Error borrando transacción:', error)
+    }
+  }
 
   const fetchTransactions = async () => {
     try {
@@ -114,15 +125,23 @@ function Dashboard() {
                     <p className="font-medium text-gray-800">{t.description}</p>
                     <p className="text-sm text-gray-400">{t.category_name} · {t.date?.slice(0, 10)}</p>
                   </div>
-                  <p className={`font-semibold ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                    {t.type === 'income' ? '+' : '-'}${Number(t.amount).toFixed(2)}
-                  </p>
-                </li>
+                  <div className="flex items-center gap-4">
+                    <p className={`font-semibold ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                      {t.type === 'income' ? '+' : '-'}${Number(t.amount).toFixed(2)}
+                    </p>
+                    <button
+                      onClick={() => handleDelete(t.id)}
+                      className="text-gray-400 hover:text-red-500 transition text-sm"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </li>           
               ))}
             </ul>
           )}
         </div>
-
+        
         <div className="grid grid-cols-2 gap-4 mt-6">
           <CategoryChart data={categoryStats} />
           <MonthlyChart data={monthlyStats} />
