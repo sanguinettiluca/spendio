@@ -3,7 +3,8 @@ const transactionModel = require('../models/transactionModel')
 async function getTransactions(req, res) {
     try {
         const userId = req.user.userId;
-        const result = await transactionModel.getTransactions(userId);
+        const filters = req.query
+        const result = await transactionModel.getTransactions(userId, filters);
         res.json(result);
     } catch (error) {
         res.status(500).json({ error: error.message });

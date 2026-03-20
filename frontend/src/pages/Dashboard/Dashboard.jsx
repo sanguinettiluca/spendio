@@ -13,6 +13,7 @@ function Dashboard() {
   const [showForm, setShowForm] = useState(false)
   const [categoryStats, setCategoryStats] = useState([])
   const [monthlyStats, setMonthlyStats] = useState([])
+  const [filters, setFilters] = useState({ startDate: '', endDate: '' })
 
 
   useEffect(() => {
@@ -33,7 +34,10 @@ function Dashboard() {
 
   const fetchTransactions = async () => {
     try {
-      const response = await getTransactions()
+      const params = {}
+      if(filters.startDate) params.startDate = filters.startDate
+      if(filters.endDate) params.endDate = filters.endDate
+      const response = await getTransactions(params)
       setTransactions(response.data)
     } catch (error) {
       console.error('Error cargando transacciones:', error)
@@ -95,6 +99,44 @@ function Dashboard() {
 
         {/* Botón para mostrar el formulario */}
         <div className="mb-6">
+          <div className="flex gap-3 mb-4 items-end">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Desde</label>
+              <input
+                type="date"
+                value={filters.startDate}
+                onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Hasta</label>
+              <input
+                type="date"
+                value={filters.endDate}
+                onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <button
+              onClick={fetchTransactions}
+              className="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700 transition"
+            >
+              Filtrar
+            </button>
+            {(filters.startDate || filters.endDate) && (
+                <button
+                    onClick={() => {
+                        setFilters({ startDate: '', endDate: '' })
+                        fetchTransactions()
+                    }}
+                    className="text-sm text-gray-500 hover:text-red-500 transition"
+                >
+                    Limpiar
+                </button>
+            )}
+          </div>
+
           <button
             onClick={() => setShowForm(!showForm)}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition text-sm"
@@ -141,7 +183,7 @@ function Dashboard() {
             </ul>
           )}
         </div>
-        
+
         <div className="grid grid-cols-2 gap-4 mt-6">
           <CategoryChart data={categoryStats} />
           <MonthlyChart data={monthlyStats} />
