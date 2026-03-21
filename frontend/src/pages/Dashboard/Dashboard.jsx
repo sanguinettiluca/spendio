@@ -6,6 +6,7 @@ import CategoryChart from '../../components/CategoryChart'
 import MonthlyChart from '../../components/MonthlyChart'
 import { getStatsByCategory, getMonthlyStats } from '../../services/statsService'
 import Modal from '../../components/Modal'
+import { useNavigate } from 'react-router-dom'
 
 function Dashboard() {
   const [transactions, setTransactions] = useState([])
@@ -16,6 +17,7 @@ function Dashboard() {
   const [monthlyStats, setMonthlyStats] = useState([])
   const [filters, setFilters] = useState({ startDate: '', endDate: '' })
   const [editingTransaction, setEditingTransaction] = useState(null)
+  const navigate = useNavigate()
 
 
   useEffect(() => {
@@ -72,12 +74,20 @@ function Dashboard() {
       {/* Navbar */}
       <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
         <h1 className="text-xl font-bold text-blue-600">Spendio</h1>
-        <button
-          onClick={logout}
-          className="text-sm text-gray-500 hover:text-red-500 transition"
-        >
-          Cerrar sesión
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate('/settings')}
+            className="text-sm text-gray-500 hover:text-blue-500 transition"
+          >
+            ⚙ Configuración
+          </button>
+          <button
+            onClick={logout}
+            className="text-sm text-gray-500 hover:text-red-500 transition"
+          >
+            Cerrar sesión
+          </button>
+        </div>
       </nav>
 
       <div className="max-w-4xl mx-auto px-6 py-8">
@@ -167,7 +177,7 @@ function Dashboard() {
                 onCancel={() => setEditingTransaction(null)}
               />
             </Modal>
-)}
+          )}
 
         {/* Lista de transacciones */}
         <div className="bg-white rounded-2xl shadow-sm p-6">
@@ -211,6 +221,7 @@ function Dashboard() {
         </div>
 
       </div>
+
     </div>
   )
   

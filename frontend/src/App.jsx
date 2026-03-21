@@ -4,12 +4,14 @@ import Dashboard from './pages/Dashboard/Dashboard'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Register from './pages/Register/Register'
+import Settings from './pages/Settings/Settings'
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          
           <Route path="/login" element={<Login />} />
 
           <Route path="/dashboard" element={
@@ -21,6 +23,13 @@ function App() {
           <Route path="/" element={<Navigate to="/login" />} />
 
           <Route path="/register" element={<Register />} />
+
+          <Route path='/settings' element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          } />
+
         </Routes>
       </BrowserRouter>
     </AuthProvider>
