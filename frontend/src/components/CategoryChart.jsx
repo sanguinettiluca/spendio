@@ -3,9 +3,9 @@ import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recha
 function CategoryChart({ data }) {
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Gastos por categoría</h2>
-        <p className="text-gray-400 text-center py-8">No hay datos todavía</p>
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Gastos por categoría</h2>
+        <p className="text-gray-400 dark:text-gray-500 text-center py-8">No hay datos todavía</p>
       </div>
     )
   }

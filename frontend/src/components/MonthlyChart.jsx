@@ -5,9 +5,9 @@ const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'O
 function MonthlyChart({ data }) {
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Evolución mensual</h2>
-        <p className="text-gray-400 text-center py-8">No hay datos todavía</p>
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Evolución mensual</h2>
+        <p className="text-gray-400 dark:text-gray-500 text-center py-8">No hay datos todavía</p>
       </div>
     )
   }
@@ -18,8 +18,8 @@ function MonthlyChart({ data }) {
   }))
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-6">
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">Evolución mensual</h2>
+    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-6">
+      <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Evolución mensual</h2>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={formattedData}>
           <XAxis dataKey="mes" />

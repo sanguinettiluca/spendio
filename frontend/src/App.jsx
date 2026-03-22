@@ -5,34 +5,37 @@ import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Register from './pages/Register/Register'
 import Settings from './pages/Settings/Settings'
+import { ThemeProvider } from './context/ThemeContext'
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          
-          <Route path="/login" element={<Login />} />
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
 
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="/login" element={<Login />} />
 
-          <Route path="/register" element={<Register />} />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/" element={<Navigate to="/login" />} />
 
-          <Route path='/settings' element={
-            <ProtectedRoute>
-              <Settings />
-            </ProtectedRoute>
-          } />
+            <Route path="/register" element={<Register />} />
 
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+            <Route path='/settings' element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            } />
+
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   )
 }
 
