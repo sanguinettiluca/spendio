@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api'
+  baseURL: 'https://spendio-production.up.railway.app/api'
 })
 
 // Interceptor — agrega el token automáticamente en cada request
