@@ -1,12 +1,12 @@
-const sql = require('mssql')
+const {pool} = require('../config/db')
 
 const findUserByEmail = async (email) => {
     try {
-        const pool = await sql.connect()
-        const user = await pool.request()
-        .input('email', sql.VarChar, email)
-        .query('SELECT * FROM users WHERE email = @email')
-        return user.recordset[0]
+        const result = await pool.query(
+            'SELECT * FROM users WHERE email = $1',
+            [email]
+        )
+        return result.rows[0]
     } catch (error) {
         console.error('Error finding user by email', error)
         throw error
@@ -15,13 +15,11 @@ const findUserByEmail = async (email) => {
 
 const createUser = async (user) => {
     try {
-        const pool = await sql.connect()
-        const result = await pool.request()
-        .input('name', sql.VarChar, user.name)
-        .input('email', sql.VarChar, user.email)
-        .input('password_hash', sql.VarChar, user.password_hash)
-        .query('INSERT INTO users (name, email, password_hash) VALUES (@name, @email, @password_hash)')
-        return result.rowsAffected[0]
+        const result = await pool.query(
+            'INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING *',
+            [user.name, user.email, user.password_hash]
+        )
+        return result.rows[0]
     } catch (error) {
         console.error('Error creating user', error)
         throw error

@@ -1,12 +1,12 @@
-const sql = require('mssql')
+const {pool} = require('../config/db')
 
 async function getCategories(userId) {
     try {
-        const pool = await sql.connect()
-        const result = await pool.request()
-        .input('userId', sql.Int, userId)
-        .query('SELECT * FROM categories WHERE user_id = @userId OR user_id IS NULL')
-        return result.recordset;
+        const result = await pool.query(
+            'SELECT * FROM categories WHERE user_id = $1 OR user_id IS NULL',
+            [userId]
+        )
+        return result.rows;
     } catch (error) {
         throw error;
     }
@@ -14,30 +14,23 @@ async function getCategories(userId) {
 
 async function createCategory(userId, name, color, icon, type){
     try{
-        const pool = await sql.connect()
-        const result = await pool.request()
-        .input('userId', sql.Int, userId)
-        .input('name', sql.VarChar, name)
-        .input('color', sql.VarChar, color)
-        .input('icon', sql.VarChar, icon)
-        .input('type', sql.VarChar, type)
-        .query(`INSERT INTO categories (user_id, name, color, icon, type) 
-            VALUES (@userId, @name, @color, @icon, @type)`)
-        return result.rowsAffected[0]  
-    }catch(error){
-        console.error('Error creando categoria', error)
-        throw error
+        const result = await pool.query(
+            'INSERT INTO categories (user_id, name, color, icon, type) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [userId, name, color, icon, type]
+        )
+        return result.rows[0]
+    } catch (error) {
+        throw error;
     }
 }
 
 async function deleteCategory(id, userId) {
     try{
-        const pool = await sql.connect()
-        const result = await pool.request()
-        .input('id', sql.Int, id)
-        .input('userId', sql.Int, userId)
-        .query('DELETE FROM categories WHERE id = @id AND user_id = @userId')
-        return result.rowsAffected[0]
+        const result = await pool.query(
+            'DELETE FROM categories WHERE id = $1 AND user_id = $2 RETURNING *',
+            [id, userId]
+        )
+        return result.rows[0]
     }catch(error){
         console.error('Error borrando categoria', error)
         throw error

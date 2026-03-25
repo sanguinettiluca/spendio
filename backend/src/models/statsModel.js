@@ -1,16 +1,15 @@
-const sql = require('mssql')
+const {pool} = require('../config/db')
 
 async function getStatsByCategory(userId){
     try{
-        const pool = await sql.connect()
-        const result = await pool.request()
-        .input('userId', sql.Int, userId)
-        .query(`SELECT c.name, c.color, SUM(t.amount) AS total
+        const result = await pool.query(
+            `SELECT c.name, c.color, SUM(t.amount) AS total
             FROM transactions t
             JOIN categories c ON t.category_id = c.id
-            WHERE t.user_id = @userId AND t.type = 'expense'
-            GROUP BY c.name, c.color`)
-        return result.recordset
+            WHERE t.user_id = $1 AND t.type = 'expense'
+            GROUP BY c.name, c.color`
+        , [userId])
+        return result.rows
     }catch(error){
         console.error('Error obteniendo stats por categoria', error)
         throw error
@@ -19,19 +18,18 @@ async function getStatsByCategory(userId){
 
 async function getMonthlyStats(userId){
     try{
-        const pool = await sql.connect()
-        const result = await pool.request()
-        .input('userId', sql.Int, userId)
-        .query(`SELECT
-            MONTH(date) as month,
-            YEAR(date) as year,
-            SUM(CASE WHEN type= 'income' THEN amount ELSE 0 END) as ingresos,
-            SUM(CASE WHEN type= 'expense' THEN amount ELSE 0 END) as gastos
+        const result = await pool.query(
+            `SELECT 
+                EXTRACT(MONTH FROM date) AS month,
+                EXTRACT(YEAR FROM date) AS year,
+                SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) AS ingresos,
+                SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) AS gastos
             FROM transactions
-            WHERE user_id = @userId
-            GROUP BY YEAR(date), MONTH(date)
-            ORDER BY year, month`)
-        return result.recordset
+            WHERE user_id = $1
+            GROUP BY EXTRACT(YEAR FROM date), EXTRACT(MONTH FROM date)
+            ORDER BY year, month`
+        , [userId])
+        return result.rows
     }catch(error){
         console.error('Error obteniendo stats mensuales', error)
         throw error
