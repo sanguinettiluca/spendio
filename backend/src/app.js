@@ -10,9 +10,9 @@ const statsRoutes = require('./routes/statsRoutes')
 const app = express()
 
 
-app.use(cors({ origin: 'http://localhost:5173', 'https://spendio-three.vercel.app' })) // Permite solicitudes desde el frontend en localhost:5173,
-//  evitando errores de CORS. Esto es necesario para que el frontend pueda comunicarse con el backend
-//  sin problemas de seguridad.
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://spendio-three.vercel.app']
+}))
 
 app.use(express.json())
 
